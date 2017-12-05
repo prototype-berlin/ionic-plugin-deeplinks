@@ -40,6 +40,8 @@
 
   _lastEvent = [self createResult:url];
 
+  [[NSNotificationCenter defaultCenter] postNotification:[NSNotification notificationWithName:CDVPluginHandleOpenURLNotification object:url]];
+
   [self sendToJs];
 
   return YES;
