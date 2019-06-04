@@ -37,6 +37,10 @@
 
 - (BOOL)handleLink:(NSURL *)url {
   NSLog(@"IonicDeepLinkPlugin: Handle link (internal) %@", url);
+  
+  if(![self checkUrl:url]) {
+    return NO;
+  }
 
   _lastEvent = [self createResult:url];
 
@@ -45,6 +49,32 @@
   [self sendToJs];
 
   return YES;
+}
+
+- (BOOL)checkUrl:(NSURL *)url {
+  if(url == nil) return NO;
+    
+  NSString* urlScheme = [[self.commandDelegate settings] objectForKey:@"url_scheme"];
+    
+  if(urlScheme == nil) return NO;
+    
+  NSLog(@"url scheme:%@",[url scheme]);
+  NSLog(@"url host:%@",[url host]);
+
+  if([[url scheme] isEqualToString:urlScheme]) {
+    return YES;
+  }
+    
+  NSString* deeplinkScheme = [[self.commandDelegate settings] objectForKey:@"deeplink_scheme"];
+  NSString* deeplinkHost = [[self.commandDelegate settings] objectForKey:@"deeplink_host"];
+    
+  if(deeplinkScheme!=nil && deeplinkHost != nil) {
+    if([[url scheme] isEqualToString:deeplinkScheme]&&[[url host] isEqualToString:deeplinkHost]) {
+      return YES;
+    }
+  }
+  
+  return NO;
 }
 
 - (BOOL)handleContinueUserActivity:(NSUserActivity *)userActivity {
